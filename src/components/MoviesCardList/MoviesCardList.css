@@ -1,0 +1,31 @@
+.cards {
+  margin: 30px 70px;
+}
+
+.cards__more {
+  background-color: #2F2F2F;
+  width: 320px;
+  height: 36px;
+  margin: auto;
+  margin-top: 50px;
+  border-radius: 6px;
+}
+
+.cards__more__text {
+  color: #FFF;
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+  padding-top: 11px;
+}
+
+@media (max-width : 450px) {
+  .cards {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .cards__more {
+    width: 240px;
+  }
+}
