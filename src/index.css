@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+}
+
+
+#root {
+  display: block;
+  background-color: #202020;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+@media (max-width: 1250px) {
+  #root {
+    max-width: 100%;
+  }
+}
