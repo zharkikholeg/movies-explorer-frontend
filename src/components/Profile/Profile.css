@@ -57,6 +57,11 @@
   background-color: #202020;
   color: #FFF;
   font-size: 13px;
+  opacity: 0.2;
+}
+
+.profile__submit_active {
+  opacity: 1;
 }
 
 .profile__exit {

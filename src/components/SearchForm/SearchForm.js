@@ -5,18 +5,20 @@ import tumb from '../../images/tumb.svg';
 
 function SearchForm(props) {
 
+
+
   return (
     <>
-      <form className="search">
+      <form className="search" onSubmit={props.handleSearchSubmit}>
         <div className="search__left">
           <img src={search} className="search__icon" alt="иконка поиска"></img>
-          <input className="search__input" placeholder="Фильм" type="text" id="film" name="film" />
-          <input className="search__submit" type="submit" value="Найти" />
+          <input className="search__input" placeholder="Фильм" type="text" id="film" name="film" onChange={props.handleSearchChange} />
+          <input className="search__submit hover" type="submit" value="Найти" />
         </div>
         <div className="search__right">
           <div className="search__devider"></div>
-          <div className="search__slider">
-            <img src={tumb} className="search__tumb" alt="тумблер переключателя"></img>
+          <div className={`search__slider ${props.shortActive ? "search__slider_active" : ""}`} onClick={props.handleShortClick}>
+            <img src={tumb} className={`search__tumb ${props.shortActive ? "search__tumb_active" : ""}`} alt="тумблер переключателя"></img>
           </div>
           <div className="search__short">Короткометражки</div>
         </div>

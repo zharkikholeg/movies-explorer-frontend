@@ -2,13 +2,14 @@ import React from "react";
 import './Navigation.css';
 import logo from '../../images/logo.svg';
 import person from '../../images/person.svg';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from 'react';
 import MobileMenu from '../MobileMenu/MobileMenu'
+import { useHistory } from 'react-router-dom';
 
 function Navigation(props) {
-  const navigate = useNavigate();
   const [isMenuOpened, setIsMenuOpened] = useState(false);
+  const history = useHistory();
 
   function handleMenuOpen() {
     setIsMenuOpened(true);
@@ -20,7 +21,7 @@ function Navigation(props) {
 
   return (
     <nav className="nav">
-      <img src={logo} alt="логотип" className="nav__logo" onClick={() => navigate('/')} />
+      <img src={logo} alt="логотип" className="nav__logo" onClick={() => history.push('/')} />
       <div className="nav__middle">
         <Link className="nav__link" to="/movies">Фильмы</Link>
         <Link className="nav__link" to="/saved-movies">Сохраненные фильмы</Link>

@@ -19,6 +19,16 @@
   padding-top: 11px;
 }
 
+.cards__error {
+  color: #EE3465;
+}
+
+.cards__notfound {
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+}
+
 @media (max-width : 450px) {
   .cards {
     margin-left: 10px;

@@ -1,0 +1,30 @@
+import validator from 'validator';
+
+const nameValidation = (name) => {
+  if (name.trim() === '') {
+    return 'Имя это обязательное поле';
+  }
+};
+
+const emailValidation = (email) => {
+  if (email.trim() === '') {
+    return 'Введите адрес электронной почты.';
+  }
+  if (!validator.isEmail(email)) {
+    return 'Введите корректный адрес';
+  }
+};
+
+const passwordValidation = (password) => {
+  if (password.trim().length <= 5) {
+    return 'Пароль должен содержать не меньше шести символов';
+  }
+};
+
+const validate = {
+  name: nameValidation,
+  email: emailValidation,
+  password: passwordValidation,
+};
+
+export default validate;

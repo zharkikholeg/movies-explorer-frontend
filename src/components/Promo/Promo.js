@@ -10,7 +10,7 @@ function Promo(props) {
     <div className="promo">
       <div className="promo__top-container">
         <img src={logo} alt="логотип" className="promo__logo" />
-        <NavTab />
+        <NavTab loggedIn={props.loggedIn} />
       </div>
       <div className="promo__wrapper">
         <div className="promo__wrapper-text">
