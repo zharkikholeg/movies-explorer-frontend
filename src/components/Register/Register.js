@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import './Register.css';
 import logo from '../../images/logo.svg';
-import { Link, Redirect } from "react-router-dom";
+import { Link, Redirect, useHistory } from "react-router-dom";
 import validate from '../../utils/formValidation';
 import api from '../../utils/MainApi';
-import { useHistory } from 'react-router-dom';
 
 
 function Register(props) {
@@ -12,6 +11,7 @@ function Register(props) {
   const [errors, setErrors] = useState({});
   const [submitPossible, setSubmitPossible] = useState(false);
   const [showApiError, setShowApiError] = useState(false);
+  const [showEmailError, setShowEmailError] = useState(false);
   const history = useHistory();
 
   React.useEffect(() => {
@@ -46,6 +46,8 @@ function Register(props) {
           console.log(res);
           if (res.status === 400) {
             setShowApiError(true);
+          } else if (res.status === 409) {
+            setShowEmailError(true);
           } else {
             api.authorize(values.email, values.password)
               .then((data) => {
@@ -68,6 +70,7 @@ function Register(props) {
 
   return (
     <form className="register" onSubmit={handleSubmit}>
+      {props.loggedIn && <Redirect to="/movies" />}
       <img src={logo} className="register__logo" alt="логотип" onClick={() => props.history.push('/')} />
       <h1 className="register__heading">Добро пожаловать!</h1>
       <p className="register__label">Имя</p>
@@ -80,6 +83,8 @@ function Register(props) {
       <input className="register__input" type="password" id="password" name="password" onChange={handleChange} />
       <p className="register__error">{errors.password}</p>
       {showApiError && <p className="register__error">Что-то пошло не так</p>}
+      {showEmailError && <p className="register__error">Пользователь с таким email уже существует</p>}
+
       <input className={`register__submit ${submitPossible ? "" : "register__submit_inactive"}`} type="submit" value="Зарегистрироваться" />
       <div className="register__footer-wrapper">
         <p className="register__question">Уже зарегистрированы?</p>

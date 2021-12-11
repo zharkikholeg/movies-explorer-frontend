@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import './Profile.css';
+import '../Register/Register.css';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { useHistory } from 'react-router-dom';
 import validate from '../../utils/formValidation';
@@ -10,7 +11,7 @@ import api from '../../utils/MainApi';
 
 function Profile(props) {
   const user = useContext(CurrentUserContext);
-  console.log(user);
+  const [showEmailError, setShowEmailError] = useState(false);
   const [submitPossible, setSubmitPossible] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: user[0].name,
@@ -60,7 +61,13 @@ function Profile(props) {
     if (submitPossible) {
       api.updateMe(userInfo.name, userInfo.email)
         .then((res) => {
-          window.location.reload();
+          console.log(res);
+          if (res.status == 409) {
+            console.log('email error');
+            setShowEmailError(true);
+          } else {
+            window.location.reload();
+          }
         })
     }
   }
@@ -80,7 +87,8 @@ function Profile(props) {
           <input className="profile__input" type="email" id="email" name="email" value={userInfo.email} onChange={handleChange} />
         </div>
         <input className={`profile__submit ${submitPossible ? "profile__submit_active hover" : ""}`} type="submit" value="Редактировать" />
-        <p className="profile__exit hover" onClick={() => { localStorage.clear('jwt'); history.push('/signin'); }}>Выйти из аккаунта</p>
+        {showEmailError && <p className="register__error">Введенный вами email принадлежит другому пользователю</p>}
+        <p className="profile__exit hover" onClick={() => { localStorage.clear(); props.handleLogout(); history.push('/'); }}>Выйти из аккаунта</p>
       </form>
       <Footer />
     </div>

@@ -60,7 +60,14 @@ class Api {
       headers: this.headers,
       body: JSON.stringify({ name, email })
     })
-      .then((res) => this._getResponseData(res));
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return response;
+        }
+      })
+      .catch((err) => { console.log(err) });
   }
 
   addMovie({ country, director, duration, year, description, image, trailer, thumbnail, nameRU, nameEN, movieId }) {
@@ -73,10 +80,13 @@ class Api {
       .then((res) => this._getResponseData(res));
   }
 
-  getMovies() {
+  getMovies(token) {
     return fetch(`${this.url}/movies`, {
       method: 'GET',
-      headers: this.headers
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      }
     })
       .then((res) => this._getResponseData(res));
   }

@@ -12,7 +12,7 @@ function SearchForm(props) {
       <form className="search" onSubmit={props.handleSearchSubmit}>
         <div className="search__left">
           <img src={search} className="search__icon" alt="иконка поиска"></img>
-          <input className="search__input" placeholder="Фильм" type="text" id="film" name="film" onChange={props.handleSearchChange} />
+          <input className="search__input" placeholder="Фильм" type="text" id="film" name="film" onChange={props.handleSearchChange} value={props.searchValue} />
           <input className="search__submit hover" type="submit" value="Найти" />
         </div>
         <div className="search__right">

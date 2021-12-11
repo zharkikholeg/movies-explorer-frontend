@@ -15,8 +15,6 @@ function MovieCard(props) {
     likedIcon = likeActive;
   }
 
-  console.log("card is liked: " + props.liked)
-
 
   function handleLikeClick() {
     props.handleLike(props.card);
@@ -24,7 +22,6 @@ function MovieCard(props) {
 
   let imgSrc = null;
   if (useLocation().pathname === "/saved-movies") {
-    console.log(props.card);
     imgSrc = props.card.image;
   } else {
     imgSrc = `https://api.nomoreparties.co${props.card.image.url}`;

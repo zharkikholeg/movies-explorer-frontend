@@ -7,8 +7,11 @@ import api from '../../utils/MainApi';
 import { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import validate from '../../utils/formValidation';
+import { Redirect } from 'react-router-dom';
+
 
 function Login(props) {
+
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
   const [submitPossible, setSubmitPossible] = useState(false);
@@ -21,6 +24,10 @@ function Login(props) {
       setSubmitPossible(false);
     }
   }, [values, errors])
+
+  // React.useEffect(() => {
+  //   console.log(props.loggedIn);
+  // }, [])
 
   function handleChange(e) {
     console.log(errors);
@@ -63,6 +70,7 @@ function Login(props) {
 
   return (
     <form className="register" onSubmit={handleSubmit}>
+      {props.loggedIn && <Redirect to="/movies" />}
       <img src={logo} className="register__logo" onClick={() => props.history.push('/')} alt="логотип" />
       <h1 className="register__heading">Рады видеть!</h1>
       <p className="register__label">Email</p>

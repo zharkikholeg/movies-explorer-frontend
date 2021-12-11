@@ -10,7 +10,6 @@ import SavedMovies from "../SavedMovies/SavedMovies";
 import { Route, Switch, withRouter, useHistory, useLocation } from 'react-router-dom';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
-import movieApi from '../../utils/MoviesApi';
 import api from '../../utils/MainApi';
 import { useState, useCallback, useEffect } from 'react';
 
@@ -21,17 +20,29 @@ function App(props) {
   const [currentUser, setCurrentUser] = useState({});
   const history = useHistory();
   const location = useLocation();
-  const [likedMovies, setLikedMovies] = useState([])
+  const [likedMovies, setLikedMovies] = useState([]) // Все сохраненные фильмы данного пользователя
+  const [filteredLikedMovies, setFilteredLikedMovies] = useState([]) // Сохрененные фильмы, который удовлетворяют условию поиска
+  const [finalSaved, setFinalSaved] = useState([]) // Сохраненные фильмы, которые будут рендериться
+  const [savedSearchValue, setSavedSearchalue] = useState("");
+  const [shortActive, setShortActive] = useState(false);
 
   // Проверяем, авторизован ли пользователь, и получаем с сервера список фильмов с лайком
   useEffect(() => {
     tokenCheck();
-    getMovies();
   }, [])
+
+  function updateContext(user) {
+    setCurrentUser(user);
+  }
 
 
   function handleLogin() {
     setLoggedIn(true);
+    //tokenCheck();
+  }
+
+  function handleLogout() {
+    setLoggedIn(false);
   }
 
   function tokenCheck() {
@@ -45,7 +56,6 @@ function App(props) {
             if (res) {
               setLoggedIn(true);
               setCurrentUser(res);
-              console.log('loggedIn set true');
               history.push(location);
             }
           })
@@ -55,7 +65,7 @@ function App(props) {
 
   // конструкция i.movieId === movie.id || i.movieId === movie.movieId используется потому, что api проекта и api BeatFilm используют movieId и id соответственно
   function handleLike(movie) {
-    console.log('like clicked');
+    const jwt = localStorage.getItem('jwt');
     const liked = likedMovies.some((i) =>
       i.movieId === movie.id || i.movieId === movie.movieId ? true : false
     );
@@ -75,7 +85,7 @@ function App(props) {
         movieId: movie.id,
       })
         .then(() => {
-          getMovies();
+          getMovies(jwt);
         })
         .catch((err) => {
           console.log(err);
@@ -86,7 +96,8 @@ function App(props) {
           ? api
             .deleteMovie(i._id)
             .then(() => {
-              getMovies();
+              getMovies(jwt);
+              setFilteredLikedMovies([]);
             })
             .catch((err) => {
               console.log(err);
@@ -96,19 +107,57 @@ function App(props) {
     }
   }
 
-  const getMovies = () => {
+  const getMovies = (token) => {
     api
-      .getMovies()
+      .getMovies(token)
       .then((res) => {
         localStorage.setItem('saved', JSON.stringify(res));
-        const savedMovies = JSON.parse(localStorage.getItem('saved'));
-        setLikedMovies(savedMovies);
+        const savedMovies = res;
+        const jwt = localStorage.getItem('jwt');
+        api.getMe(jwt)
+          .then((res) => {
+            //console.log(res[0]._id)
+            const myLikes = savedMovies.filter((item) => {
+              return item.owner == res[0]._id;
+            })
+            console.log("getMovies called")
+            setLikedMovies(myLikes);
+            setFilteredLikedMovies(myLikes);
+            setFinalSaved(myLikes);
+            localStorage.setItem('saved', JSON.stringify(myLikes));
+          })
+          .catch((err) => console.log(err));
       })
-
       .catch((err) => console.log(err));
   };
 
+  //  логика для сохраненных фильмов
+  function handleSavedSearchSubmit(e) {
+    e.preventDefault();
+    setShortActive(false);
+    console.log("search")
+    const toShow = likedMovies.filter((item) => {
+      return item.nameRU.toLowerCase().includes(savedSearchValue.toLowerCase());
+    })
+    setFilteredLikedMovies(toShow);
+    setFinalSaved(toShow);
+  }
 
+  function handleSavedSearchChange(e) {
+    setSavedSearchalue(e.target.value);
+  }
+
+  function handleShortClick() {
+    if (!shortActive) {
+      const toShow = filteredLikedMovies.filter((item) => {
+        return item.duration < 41;
+      });
+      setFinalSaved(toShow);
+    } else {
+      setFinalSaved(filteredLikedMovies);
+    }
+    setShortActive(!shortActive);
+  }
 
 
 
@@ -125,27 +174,34 @@ function App(props) {
             component={Movies}
             loggedIn={loggedIn}
             handleLike={handleLike}
-            likedMovies={likedMovies}
+            likedMovies={likedMovies} // здесь - карточки с лайком
             tokenCheck={tokenCheck}
+            updateContext={updateContext}
+            getMovies={getMovies}
           />
           <ProtectedRoute
             path="/saved-movies"
             component={SavedMovies}
             loggedIn={loggedIn}
             handleLike={handleLike}
-            likedMovies={likedMovies}
-            tokenCheck={tokenCheck}
+            likedMovies={finalSaved} // тут - именно те, которые нужно отрендерить
+            handleSavedSearchSubmit={handleSavedSearchSubmit}
+            handleSavedSearchChange={handleSavedSearchChange}
+            savedSearchValue={savedSearchValue}
+            handleShortClick={handleShortClick}
+            shortActive={shortActive}
           />
           <ProtectedRoute
             path="/profile"
             component={Profile}
             loggedIn={loggedIn}
+            handleLogout={handleLogout}
           />
           <Route path='/signup'>
-            <Register handleLogin={handleLogin} />
+            <Register handleLogin={handleLogin} loggedIn={loggedIn} />
           </Route>
           <Route path='/signin'>
-            <Login handleLogin={handleLogin} />
+            <Login handleLogin={handleLogin} loggedIn={loggedIn} tokenCheck={tokenCheck} />
           </Route>
           <Route path='*'>
             <PageNotFound />

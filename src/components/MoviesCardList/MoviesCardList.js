@@ -1,7 +1,6 @@
 import React from "react";
 import './MoviesCardList.css';
 import MovieCard from '../MovieCard/MovieCard';
-import Preloader from '../Preloader/Preloader';
 import { useLocation } from "react-router-dom";
 
 function MoviesCardList(props) {
