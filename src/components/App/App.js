@@ -12,6 +12,8 @@ import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import api from '../../utils/MainApi';
 import { useState, useCallback, useEffect } from 'react';
+import validate from '../../utils/formValidation';
+
 
 
 function App(props) {
@@ -23,8 +25,13 @@ function App(props) {
   const [likedMovies, setLikedMovies] = useState([]) // Все сохраненные фильмы данного пользователя
   const [filteredLikedMovies, setFilteredLikedMovies] = useState([]) // Сохрененные фильмы, который удовлетворяют условию поиска
   const [finalSaved, setFinalSaved] = useState([]) // Сохраненные фильмы, которые будут рендериться
-  const [savedSearchValue, setSavedSearchalue] = useState("");
-  const [shortActive, setShortActive] = useState(false);
+  const [savedSearchValue, setSavedSearchalue] = useState(""); // Для сохраненных фильмов
+  const [shortActive, setShortActive] = useState(false); // Для сохраненных фильмов
+  const [userInfo, setUserInfo] = useState({}); // user для страницы профиля
+  const [errors, setErrors] = useState({}); // Ошибки для страницы профиля
+  const [submitPossible, setSubmitPossible] = useState(false); // Активность кнопки сабмита для страницы профиля
+  const [showEmailError, setShowEmailError] = useState(false);  // Ошибка почты для страницы профиля
+
 
   // Проверяем, авторизован ли пользователь, и получаем с сервера список фильмов с лайком
   useEffect(() => {
@@ -32,7 +39,67 @@ function App(props) {
   }, [])
 
   function updateContext(user) {
-    setCurrentUser(user);
+    setCurrentUser(user[0]);
+    setUserInfo({
+      name: user[0].name,
+      email: user[0].email,
+    })
+  }
+
+  // логика для страницы профиля
+  function handleUserInfoChange(e) {
+    const { name, value } = e.target;
+    setUserInfo({
+      ...userInfo,
+      [name]: value,
+    });
+
+    const { [name]: removedError, ...rest } = errors;
+    const error = validate[name](value);
+    setErrors({
+      ...rest,
+      ...(error && { [name]: userInfo[name] && error }),
+    });
+  }
+
+  useEffect(() => {
+    if (errors && Object.keys(errors).length === 0 && Object.keys(userInfo).length > 1)
+      if (
+        userInfo.name !== currentUser.name ||
+        userInfo.email !== currentUser.email
+      ) {
+        console.log(userInfo.name !== currentUser.name);
+        console.log(userInfo.email !== currentUser.email);
+
+        setSubmitPossible(true);
+      } else {
+        setSubmitPossible(false);
+      }
+  }, [
+    errors,
+    currentUser.email,
+    currentUser.name,
+    userInfo.email,
+    userInfo.name,
+  ]);
+
+  function handleProfileSubmit(e) {
+    e.preventDefault();
+    if (submitPossible) {
+      api.updateMe(userInfo.name, userInfo.email)
+        .then((res) => {
+          console.log(res);
+          if (res.status == 409) {
+            console.log('email error');
+            setShowEmailError(true);
+          } else {
+            setCurrentUser({
+              name: userInfo.name,
+              email: userInfo.email
+            })
+          }
+        })
+    }
   }
 
 
@@ -63,6 +130,7 @@ function App(props) {
     }
   }
 
+  //  логика лайков
   // конструкция i.movieId === movie.id || i.movieId === movie.movieId используется потому, что api проекта и api BeatFilm используют movieId и id соответственно
   function handleLike(movie) {
     const jwt = localStorage.getItem('jwt');
@@ -196,6 +264,12 @@ function App(props) {
             component={Profile}
             loggedIn={loggedIn}
             handleLogout={handleLogout}
+            userInfo={userInfo}
+            handleChange={handleUserInfoChange}
+            currentUser={currentUser}
+            submitPossible={submitPossible}
+            handleSubmit={handleProfileSubmit}
+            showEmailError={showEmailError}
           />
           <Route path='/signup'>
             <Register handleLogin={handleLogin} loggedIn={loggedIn} />
