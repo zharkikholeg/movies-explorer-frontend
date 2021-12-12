@@ -1,13 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React from "react";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import './Profile.css';
 import '../Register/Register.css';
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { useHistory } from 'react-router-dom';
-import validate from '../../utils/formValidation';
-import api from '../../utils/MainApi';
-
+import InfoTooltip from "../InfoTooltip/InfoTooltip";
 
 function Profile(props) {
   const history = useHistory();
@@ -31,6 +28,7 @@ function Profile(props) {
         <p className="profile__exit hover" onClick={() => { localStorage.clear(); props.handleLogout(); history.push('/'); }}>Выйти из аккаунта</p>
       </form>
       <Footer />
+      <InfoTooltip isOpen={props.isInfoOpen} onClose={props.handleInfoClose} isSuccessful={true} />
     </div>
   )
 }

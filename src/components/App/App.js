@@ -14,8 +14,6 @@ import api from '../../utils/MainApi';
 import { useState, useCallback, useEffect } from 'react';
 import validate from '../../utils/formValidation';
 
-
-
 function App(props) {
 
   const [loggedIn, setLoggedIn] = useState(false);
@@ -31,6 +29,7 @@ function App(props) {
   const [errors, setErrors] = useState({}); // Ошибки для страницы профиля
   const [submitPossible, setSubmitPossible] = useState(false); // Активность кнопки сабмита для страницы профиля
   const [showEmailError, setShowEmailError] = useState(false);  // Ошибка почты для страницы профиля
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
 
   // Проверяем, авторизован ли пользователь, и получаем с сервера список фильмов с лайком
@@ -60,6 +59,10 @@ function App(props) {
       ...rest,
       ...(error && { [name]: userInfo[name] && error }),
     });
+  }
+
+  function handleInfoClose() {
+    setIsInfoOpen(false);
   }
 
   useEffect(() => {
@@ -97,6 +100,7 @@ function App(props) {
               name: userInfo.name,
               email: userInfo.email
             })
+            setIsInfoOpen(true);
           }
         })
     }
@@ -270,6 +274,8 @@ function App(props) {
             submitPossible={submitPossible}
             handleSubmit={handleProfileSubmit}
             showEmailError={showEmailError}
+            isInfoOpen={isInfoOpen}
+            handleInfoClose={handleInfoClose}
           />
           <Route path='/signup'>
             <Register handleLogin={handleLogin} loggedIn={loggedIn} />

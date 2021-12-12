@@ -55,9 +55,13 @@ class Api {
   }
 
   updateMe(name, email) {
+    const jwt = localStorage.getItem('jwt');
     return fetch(`${this.url}/users/me`, {
       method: 'PATCH',
-      headers: this.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${jwt}`
+      },
       body: JSON.stringify({ name, email })
     })
       .then((response) => {
@@ -71,10 +75,14 @@ class Api {
   }
 
   addMovie({ country, director, duration, year, description, image, trailer, thumbnail, nameRU, nameEN, movieId }) {
-    console.log(country)
+    //console.log(country)
+    const jwt = localStorage.getItem('jwt');
     return fetch(`${this.url}/movies`, {
       method: 'POST',
-      headers: this.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${jwt}`
+      },
       body: JSON.stringify({ country, director, duration, year, description, image, trailer, thumbnail, nameRU, nameEN, movieId })
     })
       .then((res) => this._getResponseData(res));
@@ -92,9 +100,13 @@ class Api {
   }
 
   deleteMovie(id) {
+    const jwt = localStorage.getItem('jwt');
     return fetch(`${this.url}/movies/${id}`, {
       method: 'DELETE',
-      headers: this.headers
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${jwt}`
+      },
     })
       .then((res) => this._getResponseData(res));
   }
