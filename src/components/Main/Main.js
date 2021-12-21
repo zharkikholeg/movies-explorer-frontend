@@ -12,7 +12,7 @@ function Main(props) {
 
   return (
     <>
-      <Promo />
+      <Promo loggedIn={props.loggedIn} />
       <AboutProject />
       <Tech />
       <AboutMe />

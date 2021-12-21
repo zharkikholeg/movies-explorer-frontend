@@ -72,6 +72,15 @@
   font-size: 14px;
 }
 
+ .register__error {
+   font-size: 14px;
+   color: red;
+ }
+
+ .register__submit_inactive {
+   background-color: #8B8B8B;
+ }
+
 @media (max-width : 500px) {
 
   .register {
